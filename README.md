@@ -2,7 +2,7 @@
 The following package was created to analyse information recieved from EMGs during AGSM training,
 the repository contains TMSi repository, this is necessary to read the relevent files as the package cannot just be installed using pip
 
-![alt text](https://github.com/mayahar/EMG_dataread/blob/main/Workflow_examples\Figure_3.png)
+![alt text](https://github.com/mayahar/EMG_dataread/blob/main/Workflow_examples/Figure_3.png)
 
 Anti-G Straining Maneuver - or AGSM is a technic involving muscle tonus and a breathing technic, 
 that in their combination raise the blood presure in the brain, in order to compansate for the higher gravity acceleration.
