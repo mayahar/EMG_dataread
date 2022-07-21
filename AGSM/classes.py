@@ -6,9 +6,25 @@ import matplotlib.pyplot as plt
 from scipy import signal, optimize
 
 class EMG:
-    def __init__(self,path=None, labels = ["Right Shin","ref","Left Shin","Right Thigh","Left Thigh","Stomach","ref","ref"]):
+
+    """" Creates an object of EMG data recieved from poly5 type file """
+
+    def __init__(
+            self,
+            labels, 
+            path=None):
+        """
+        Parameters
+        ---
+        labels: list
+            A list that names each of the EMG electrodes by their order
+            reference electordes should be named as "ref",
+            usually the names will be the names of the muscle or body part the electrode was put on
+        """
+
         self.data=Poly5Reader(path) #Create a tmsi object
         reference_elec = [i for i, s in enumerate(labels) if "ref" in s]
+        
         if "ref" in labels:           
             self.labels = [value for value in labels if value != "ref"]
             #Remove reference electrodes
@@ -17,9 +33,18 @@ class EMG:
         self.array = np.delete(self.data.samples, reference_elec,0)
         self.time_axis = np.divide(np.arange(0,self.data.num_samples),self.data.sample_rate)
     
-    def high_pass_filter(self,muscle,filter=10,order=5):
-    #Add high pass filter for selected electrode
-        elec = list(self.labels).index(muscle)
+    def high_pass_filter(self,label,filter=10,order=5):
+        """
+        This function adds a filter to the selected electrode, it changes the data in the object
+
+        Parameters
+        ---
+        label: str
+            A string that is in the labels list, refers to the relevent electride
+        filter: int
+        order: int
+        """
+        elec = list(self.labels).index(label)
         #Select the relevent row based in prefered muscle
         feq = self.data.sample_rate
         cutoff = filter/(0.5*feq)
@@ -29,7 +54,15 @@ class EMG:
         self.array[elec] = y
 
     def rms(self,width=20):
-    #Filter and smooth all electrodes by applying rms for selected window
+        """
+        This function is applied on all the electrodes, for each window it replaces its
+        values with the rms of the window, it changes the data in the object
+
+        Parameters
+        ---
+        width: int
+            The amount of sampels wanted in each window
+        """
         for muscle in self.labels:
             elec = list(self.labels).index(muscle)
             mat = np.reshape(self.array[elec],(self.data.num_samples//width,width))
@@ -38,7 +71,9 @@ class EMG:
             self.array[elec] = np.reshape(mat,(1,self.data.num_samples))
     
     def all_electrodes_plot(self):
-    #Create a plot that represent all the eletrodes in the array        
+        """
+        This function creates a plot that represent all the eletrodes in the array
+        """        
         fig, axes = plt.subplots(np.size(self.labels),sharex=True,sharey=True)
         for read in range(0,np.size(self.labels)):
             axes[read].plot(self.time_axis,self.array[read])
@@ -52,9 +87,29 @@ class EMG:
 
         plt.show()
 
-    def power_applied(self,time_frames,muscle):
-    #Time frames shoud be a list of tupels - inital time and period
-        elec = list(self.labels).index(muscle)
+    def power_applied(self,time_frames,label):
+        """
+        This function sums the power applied in each trial for specific electrode, 
+        it also creates a relexation measurments that showes the level at which the subject
+        relexed their muscles during the trial time period
+
+        Parameters
+        ---
+        time_frame: tuples list
+            Each tuple represents a trial, 
+            the first element in each tuple should state the strating time of the trial,
+            and the second one should state the trial duration, both in seconds
+        label: str
+            A string that is in the labels list, refers to the relevent electride
+
+        Returns
+        ---
+        powers: list
+            A list of power sum applied in each trial
+        relaxation: list
+            A list of relaxation levels in each trial
+        """
+        elec = list(self.labels).index(label)
         powers = []
         relaxation = []
         for trial in time_frames:
@@ -64,6 +119,17 @@ class EMG:
         return powers,relaxation
 
     def check_appropriate_power(self,powers,Precentegas=[50,100],error=0.2):
+        """
+        This function examens wether the force applied in different trials 
+        matches in their proportions
+
+        Parameters
+        ---
+        power: list
+            a list of powers applied in each trial, recieved from power_applied function
+        precentages: list
+            a list of tonus precenteges told the subjects to apply in each trial
+        """
         ratio = powers[0]/powers[1]
         desired_ratio = Precentegas[0]/Precentegas[1]
         if desired_ratio+error>=ratio and desired_ratio-error<=ratio:
