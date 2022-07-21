@@ -1,5 +1,6 @@
 # EMG_dataread
-The following package was created to analyse information recieved from EMGs during AGSM training, 
+The following package was created to analyse information recieved from EMGs during AGSM training,
+the repository contains TMSi repository, this is necessary to read the relevent files as the package cannot just be installed using pip
 
 image.png
 
