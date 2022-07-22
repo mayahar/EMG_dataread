@@ -1,4 +1,4 @@
-from AGSM.classes import EMG
+from AGSM.Data_manipulation_and_plotting import EMG
 
 subject  = EMG()
 subject.all_electrodes_plot()

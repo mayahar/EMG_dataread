@@ -1,4 +1,4 @@
-from AGSM.classes import EMG
+from AGSM.Data_manipulation_and_plotting import EMG
 
 def check_ref_label_removel():
     labels = ["Biceps","ref","Triceps"]

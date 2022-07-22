@@ -1,17 +1,14 @@
-import sys
-sys.path.append("../")
-from tmsi.TMSiSDK.file_readers import Poly5Reader
+from Data_read_from_existing_file import Data_read_from_poly5
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal, optimize
 
 class EMG:
-
-    """" Creates an object of EMG data recieved from poly5 type file """
-
+    
     def __init__(
             self,
-            labels, 
+            labels,
+            type="Poly5",
             path=None):
         """
         Parameters
@@ -20,18 +17,20 @@ class EMG:
             A list that names each of the EMG electrodes by their order
             reference electordes should be named as "ref",
             usually the names will be the names of the muscle or body part the electrode was put on
-        """
-
-        self.data=Poly5Reader(path) #Create a tmsi object
-        reference_elec = [i for i, s in enumerate(labels) if "ref" in s]
         
-        if "ref" in labels:           
-            self.labels = [value for value in labels if value != "ref"]
-            #Remove reference electrodes
+        type: string [Poly5]
+            A string that specify where the data will be taken from, 
+            currently the package can only take information from extracted poly5 file
+        
+        path: if the data exist in a existing file, 
+        this will be a path to the desired file, when left empty a browsing tab will open
+        """
+        if type == "Poly5":
+            self  = Data_read_from_poly5(labels,path)
         else:
-            self.labels = labels
-        self.array = np.delete(self.data.samples, reference_elec,0)
-        self.time_axis = np.divide(np.arange(0,self.data.num_samples),self.data.sample_rate)
+            type = input("Data read from")
+
+
     
     def high_pass_filter(self,label,filter=10,order=5):
         """
